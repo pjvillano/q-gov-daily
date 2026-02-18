@@ -1,0 +1,35 @@
+name: Q-GOV Quantum Daily Brief
+
+on:
+  schedule:
+    # Runs every weekday at 6:30 AM Eastern (11:30 UTC)
+    # Adjust UTC offset: EST = UTC-5, EDT = UTC-4
+    # Change "30 11" to your preferred send time in UTC
+    - cron: "30 11 * * 1-5"
+
+  # Allows you to trigger manually from the GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  send-brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install anthropic
+
+      - name: Generate and send Q-GOV Daily Brief
+        env:
+          ANTHROPIC_API_KEY:   ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_USER:          ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD:  ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python send_brief.py
